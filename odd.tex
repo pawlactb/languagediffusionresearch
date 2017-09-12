@@ -1,16 +1,56 @@
 \documentclass{article}
 
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=1.25in]{geometry}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{enumerate}
 
-\title{ODD Framework for an Agent Based Model to Model Language Shift as Diffusion}
+\title{ODD Framework for an Agent Based  Language Shift Model}
 
 \author{Tyler Pawlaczyk \and Dr. Jonathan Martin \and Dr. Diana White}
 
 \begin{document}
 
 \maketitle
+
+\section{Purpose}
+This model seeks to explain the dynamics of Language Shift in a location, specifically Southern Austria. Potential uses include simulating the spatial spread of language trends, and any other phenomena that can be postulated as a spatial spread.
+
+\section{Entities, State Variables and Scales}
+\subsection{Entities}
+There is only one acting agent in this model, the LanguageAgent. All LanguageAgents are contained within a singular LanguageModel.
+
+\subsection{LanguageAgent}
+The LanguageAgent represents a single location during the duration of the simulation. In all typical uses of this model, the typical state variables will be employed by the LanguageAgents. The extraneous state variables are used in special cases. The extraneous state variables mentioned here are primarily for comparing with results with Prochazaka's 2017 findings.
+
+\subsubsection{Typical State Variables}
+\begin{itemize}
+\item \texttt{Name} (string)\\
+Each LanguageAgent contains a string field that is the name of the location it represents.
+
+\item \texttt{probability, next\_probability} (double) \\
+The \texttt{probability} and \texttt{next\_probability} store information regarding the probability of speaking either language for the current and next timestep. \texttt{next\_probability} is required due to the design of the scheduler.
+
+\item \texttt{population} (integer) \\
+Each region represented by a LanguageAgent has a population for each timestep. The population is updated every timestep.
+
+\end{itemize}
+
+\subsection{Extraneous State Variables}
+\begin{itemize}
+\item \texttt{p\_probability}, \texttt{p\_next\_probability} (double) \\
+
+
+\end{itemize}
+
+\section{Process Overview and Scheduling}
+
+\section{Design Concepts}
+
+ \section{Initialization}
+
+\section{Input Data}
+
+\section{Submodels}
 
 \end{document}
