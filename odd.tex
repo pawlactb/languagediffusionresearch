@@ -14,19 +14,25 @@
 \maketitle
 
 \section{Purpose}
-This model seeks to explain the dynamics of Language Shift in a location, specifically Southern Austria. Potential uses include simulating the spatial spread of language trends, and any other phenomena that can be postulated as a spatial spread.
+This model seeks to explain the dynamics of Language Shift in a location, specifically Southern Austria. With little modification from the provided example, uses include simulating the spatial spread of language trends.  and any other phenomena that can be postulated as a spatial spread.
 
 \section{Entities, State Variables and Scales}
-\subsection{Entities}
-There is only one acting agent in this model, the LanguageAgent. All LanguageAgents are contained within a singular LanguageModel.
+\subsection{Overview}
+There is only one acting agent in this model, the LanguageAgent. All LanguageAgents are contained within the same LanguageModel. LanguageModels also contain another singular entity to handle neighborhood calculations, the NeighborList.
 
 \subsection{LanguageAgent}
-The LanguageAgent represents a single location during the duration of the simulation. In all typical uses of this model, the typical state variables will be employed by the LanguageAgents. The extraneous state variables are used in special cases. The extraneous state variables mentioned here are primarily for comparing with results with Prochazaka's 2017 findings.
+
+The LanguageAgent represents a single location during the duration of the simulation. In all typical uses of this model, the typical state variables will be employed by the LanguageAgents. Extraneous state variables are used in special cases. The extraneous state variables mentioned here are primarily for comparing with results with Prochazaka's 2017 findings.
+
+Many LanguageAgents are contained in a LanguageModel. The neighborhood relation of LanguageAgents is determined by the LanguageModel's NeighborList.
 
 \subsubsection{Typical State Variables}
 \begin{itemize}
-\item \texttt{Name} (string)\\
+\item \texttt{name} (string)\\
 Each LanguageAgent contains a string field that is the name of the location it represents.
+
+\item \texttt{pos} (tuple: (float, float)) \\
+
 
 \item \texttt{probability, next\_probability} (double) \\
 The \texttt{probability} and \texttt{next\_probability} store information regarding the probability of speaking either language for the current and next timestep. \texttt{next\_probability} is required due to the design of the scheduler.
@@ -36,12 +42,16 @@ Each region represented by a LanguageAgent has a population for each timestep. T
 
 \end{itemize}
 
-\subsection{Extraneous State Variables}
+\subsubsection{Extraneous State Variables}
 \begin{itemize}
 \item \texttt{p\_probability}, \texttt{p\_next\_probability} (double) \\
-
+Used to store the probabilities calculated as described in Prochazaka's 2017 paper.
 
 \end{itemize}
+
+\subsubsection{Scale}
+
+In the provided example, each 
 
 \section{Process Overview and Scheduling}
 
