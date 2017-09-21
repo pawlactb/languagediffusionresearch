@@ -32,7 +32,7 @@ Many LanguageAgents are contained in a LanguageModel. The neighborhood relation 
 Each LanguageAgent contains a string field that is the name of the location it represents.
 
 \item \texttt{pos} (tuple: (float, float)) \\
-
+The position of the LanguageAgent. In the provided example, this is the latitude/longitude coordinates of the location. \texttt{pos} is used by the NeighborList to determine the LanguageAgent's neighborhood.
 
 \item \texttt{probability, next\_probability} (double) \\
 The \texttt{probability} and \texttt{next\_probability} store information regarding the probability of speaking either language for the current and next timestep. \texttt{next\_probability} is required due to the design of the scheduler.
@@ -51,9 +51,40 @@ Used to store the probabilities calculated as described in Prochazaka's 2017 pap
 
 \subsubsection{Scale}
 
-In the provided example, each 
+In the provided example, each LanguageAgent represents a region approximately 1 square kilometer in area.
+
+\subsection{LanguageModel}
+The LanguageModel is the ``container" in which the simulations happen. The LanguageModel is responsible for reading in initialization data, initializing LanguageAgent objects, and collecting data.
+
+\subsubsection{Typical State Variables}
+\begin{itemize}
+\item \texttt{diffusion} (list: [float]) \\
+Represents the diffusivity of each language. In the provided simulation, the first element of the list is the German diffusivity, and the second is the Slovene diffusivity. Usually size of two.
+
+\item \texttt{pop\_data} (DataFrame: int) \\
+Maintains a pandas dataframe of populations for every timestep.
+
+\item \texttt{neighbors} (NeighborList) \\
+Maintains a list of neighbors to each agent.
+
+\item \texttt{agents} (list: [LanguageAgent]) \\
+A list of all agents indexed by their \texttt{unique\_id}.
+
+\end{itemize}
+
+\subsubsection{Scale}
+The LanguageModel is scaled for the whole simulation in all times and spaces.
+
+\subsection{NeighborList}
+The NeighborList is responsible initially for generating the nearest neighbors of each agent, and then maintaining a list of neighbors for each agent.
+
+\subsubsection{Implementation Details}
+The NeighborList first obtains the position of all LanguageAgents in the LanguageModel. The NeighborList first calculates the distance for each LanguageAgent to all other LanguageAgents. The LanguageAgents are then loaded into a priority minimum queue by their distance. In order to save computing time, the priority queue is only popped for the number of 
+
+
 
 \section{Process Overview and Scheduling}
+
 
 \section{Design Concepts}
 
