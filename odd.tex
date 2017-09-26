@@ -7,7 +7,7 @@
 
 \title{ODD Framework for an Agent Based  Language Shift Model}
 
-\author{Tyler Pawlaczyk \and Dr. Jonathan Martin \and Dr. Diana White}
+\author{Tyler Pawlaczyk \\ \texttt{pawlactb@clarkson.edu}}
 
 \begin{document}
 
@@ -79,19 +79,48 @@ The LanguageModel is scaled for the whole simulation in all times and spaces.
 The NeighborList is responsible initially for generating the nearest neighbors of each agent, and then maintaining a list of neighbors for each agent.
 
 \subsubsection{Implementation Details}
-The NeighborList first obtains the position of all LanguageAgents in the LanguageModel. The NeighborList first calculates the distance for each LanguageAgent to all other LanguageAgents. The LanguageAgents are then loaded into a priority minimum queue by their distance. In order to save computing time, the priority queue is only popped for the number of 
-
+The NeighborList first obtains the position of all LanguageAgents in the LanguageModel. The NeighborList first calculates the distance for each LanguageAgent to all other LanguageAgents. The LanguageAgents are then loaded into a priority minimum queue by their distance. In order to save computing time, the priority queue is only popped for the number of neighbors needed for the simulation (usually 2-10). The neighbors are then stored in a list within a dictionary. To obtain the neighbors of a LanguageAgent, one queries the dictionary of neighbors with the \texttt{unique\_id} of the LanguageAgent and is returned a list of \text{unique\_id}s of neighbors, in order of increasing distance.
+The NeighborList can also be serialized and stored as a Python Pickle, to avoid repeated lengthy calculation when changing other model parameters.
 
 
 \section{Process Overview and Scheduling}
+When the model is ran under typical execution, the LanguageModel is initialized first. The LanguageModel reads in the location and populations of all LanguageAgents (creating them as needed) and passes this information onto the NeighborList, if no NeighborList serialization is available.
 
+\subsection{Data Loading and Neighbor Calculations}
+If serialization is available via Python Pickle, the pickle file is loaded into the NeighborList to avoid the (potentially lengthy) neightbor calculation. To determine neighbors, first the NeighborList calculates the distance from every LanguageAgent to every other LanguageAgent. Then, for every LanguageAgent in the simulation the other LanguageAgents' \texttt{unique\_id} is loaded into a minimum-priority queue. The queue is then popped a satisfactory amount to obtain the closest neighbors to each LanguageAgent. The \texttt{unique\_id} of each neighbor is then stored in a list as the attachment of a dictionary for ease of neighbor lookup.
 
-\section{Design Concepts}
+\subsection{Model Runtime}
+After the neighbors have been calculated and the LanguageAgents are initialized by the LanguageModel, the model is ready to begin simulation.
 
- \section{Initialization}
+\subsubsection{Scheduling}
+Each LanguageAgent has two methods, called \texttt{step()} and \texttt{advance()}. The \texttt{step()} method is responsible for calculating the contribution to the current cell from it's neighbors. In order to solve problems with concurrency of LanguageAgents updating before their neighbors (causing temporal inconsistencies) the LanguageAgent's do not update their state variables until the \texttt{advance()} method is called.\\
+In the \texttt{step()} routine, the LanguageAgent $k$ first obtains its neighbors from the LanguageModel's NeighborList. The contribution from each neighbor $r$ to $k$ is defined as
+
+\begin{align}
+	C_{\alpha r} &= \frac{n_{\alpha r}}{4\pi D_\alpha \Delta t} \exp \left( - \frac{|\text{dist}|^2}{4 D_\alpha \Delta t} \right),
+\end{align}
+
+with $n_{\alpha r} $ being the number of speakers of language $\alpha$ in neighboring LanguageAgent $r$ at time $t$, $\text{dist}$ being the distance between the LanguageAgents, $D_\alpha$ being the diffusion of language $\alpha$, and $\Delta t$ being the timestep size of the model. The contribution from all neighbors for language $\alpha$, $F$ is defined as
+
+\begin{align}
+	F_\alpha &= \sum_{\text{neigh.}} C_\alpha.
+\end{align}
+
+The \texttt{next\_probability}, $P_\alpha$, of a LanguageAgent is determined as:
+
+\begin{align}
+	P_\alpha &= \frac{n_{\alpha k} + F_\alpha}{\sum_{\text{lang.}} n_{\alpha k} + \sum_{\text{lang.}} F_{\alpha} } ~.
+\end{align}
+
+After the \texttt{step()} for all LanguageAgents, the \texttt{advance()} method updates the state variables for the next timestep.
+
+\subsubsection{Data Collection}
+
 
 \section{Input Data}
 
 \section{Submodels}
+
+\section{Extensions/Future Work}
 
 \end{document}
