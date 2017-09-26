@@ -1,17 +1,34 @@
+% !TeX root = odd.tex
+% !TeX spellcheck = en_US
+% !TeX encoding = UTF-8
+
 \documentclass{article}
 
 \usepackage[margin=1.25in]{geometry}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{enumerate}
+\usepackage{graphicx}
 
 \title{ODD Framework for an Agent Based  Language Shift Model}
 
 \author{Tyler Pawlaczyk \\ \texttt{pawlactb@clarkson.edu}}
 
+\usepackage{color}   %May be necessary if you want to color links
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linktoc=all,
+    linkcolor=black
+}
+
 \begin{document}
 
 \maketitle
+
+\tableofcontents
+
+\pagebreak
 
 \section{Purpose}
 This model seeks to explain the dynamics of Language Shift in a location, specifically Southern Austria. With little modification from the provided example, uses include simulating the spatial spread of language trends.  and any other phenomena that can be postulated as a spatial spread.
@@ -28,25 +45,25 @@ Many LanguageAgents are contained in a LanguageModel. The neighborhood relation 
 
 \subsubsection{Typical State Variables}
 \begin{itemize}
-\item \texttt{name} (string)\\
-Each LanguageAgent contains a string field that is the name of the location it represents.
-
-\item \texttt{pos} (tuple: (float, float)) \\
-The position of the LanguageAgent. In the provided example, this is the latitude/longitude coordinates of the location. \texttt{pos} is used by the NeighborList to determine the LanguageAgent's neighborhood.
-
-\item \texttt{probability, next\_probability} (double) \\
-The \texttt{probability} and \texttt{next\_probability} store information regarding the probability of speaking either language for the current and next timestep. \texttt{next\_probability} is required due to the design of the scheduler.
-
-\item \texttt{population} (integer) \\
-Each region represented by a LanguageAgent has a population for each timestep. The population is updated every timestep.
-
+	\item \texttt{name} (string)\\
+	      Each LanguageAgent contains a string field that is the name of the location it represents.
+	      
+	\item \texttt{pos} (tuple: (float, float)) \\
+	      The position of the LanguageAgent. In the provided example, this is the latitude/longitude coordinates of the location. \texttt{pos} is used by the NeighborList to determine the LanguageAgent's neighborhood.
+	      
+	\item \texttt{probability, next\_probability} (double) \\
+	      The \texttt{probability} and \texttt{next\_probability} store information regarding the probability of speaking either language for the current and next timestep. \texttt{next\_probability} is required due to the design of the scheduler.
+	      
+	\item \texttt{population} (integer) \\
+	      Each region represented by a LanguageAgent has a population for each timestep. The population is updated every timestep.
+	      
 \end{itemize}
 
 \subsubsection{Extraneous State Variables}
 \begin{itemize}
-\item \texttt{p\_probability}, \texttt{p\_next\_probability} (double) \\
-Used to store the probabilities calculated as described in Prochazaka's 2017 paper.
-
+	\item \texttt{p\_probability}, \texttt{p\_next\_probability} (double) \\
+	      Used to store the probabilities calculated as described in Prochazaka's 2017 paper.
+	      
 \end{itemize}
 
 \subsubsection{Scale}
@@ -58,18 +75,18 @@ The LanguageModel is the ``container" in which the simulations happen. The Langu
 
 \subsubsection{Typical State Variables}
 \begin{itemize}
-\item \texttt{diffusion} (list: [float]) \\
-Represents the diffusivity of each language. In the provided simulation, the first element of the list is the German diffusivity, and the second is the Slovene diffusivity. Usually size of two.
-
-\item \texttt{pop\_data} (DataFrame: int) \\
-Maintains a pandas dataframe of populations for every timestep.
-
-\item \texttt{neighbors} (NeighborList) \\
-Maintains a list of neighbors to each agent.
-
-\item \texttt{agents} (list: [LanguageAgent]) \\
-A list of all agents indexed by their \texttt{unique\_id}.
-
+	\item \texttt{diffusion} (list: [float]) \\
+	      Represents the diffusivity of each language. In the provided simulation, the first element of the list is the German diffusivity, and the second is the Slovene diffusivity. Usually size of two.
+	      
+	\item \texttt{pop\_data} (DataFrame: int) \\
+	      Maintains a pandas dataframe of populations for every timestep.
+	      
+	\item \texttt{neighbors} (NeighborList) \\
+	      Maintains a list of neighbors to each agent.
+	      
+	\item \texttt{agents} (list: [LanguageAgent]) \\
+	      A list of all agents indexed by their \texttt{unique\_id}.
+	      
 \end{itemize}
 
 \subsubsection{Scale}
@@ -97,30 +114,74 @@ Each LanguageAgent has two methods, called \texttt{step()} and \texttt{advance()
 In the \texttt{step()} routine, the LanguageAgent $k$ first obtains its neighbors from the LanguageModel's NeighborList. The contribution from each neighbor $r$ to $k$ is defined as
 
 \begin{align}
-	C_{\alpha r} &= \frac{n_{\alpha r}}{4\pi D_\alpha \Delta t} \exp \left( - \frac{|\text{dist}|^2}{4 D_\alpha \Delta t} \right),
+	C_{\alpha r} & = \frac{n_{\alpha r}}{4\pi D_\alpha \Delta t} \exp \left( - \frac{|\text{dist}|^2}{4 D_\alpha \Delta t} \right), 
 \end{align}
 
 with $n_{\alpha r} $ being the number of speakers of language $\alpha$ in neighboring LanguageAgent $r$ at time $t$, $\text{dist}$ being the distance between the LanguageAgents, $D_\alpha$ being the diffusion of language $\alpha$, and $\Delta t$ being the timestep size of the model. The contribution from all neighbors for language $\alpha$, $F$ is defined as
 
 \begin{align}
-	F_\alpha &= \sum_{\text{neigh.}} C_\alpha.
+	F_\alpha & = \sum_{\text{neigh.}} C_\alpha. 
 \end{align}
 
 The \texttt{next\_probability}, $P_\alpha$, of a LanguageAgent is determined as:
 
 \begin{align}
-	P_\alpha &= \frac{n_{\alpha k} + F_\alpha}{\sum_{\text{lang.}} n_{\alpha k} + \sum_{\text{lang.}} F_{\alpha} } ~.
+	P_\alpha & = \frac{n_{\alpha k} + F_\alpha}{\sum_{\text{lang.}} n_{\alpha k} + \sum_{\text{lang.}} F_{\alpha} } ~. 
 \end{align}
 
 After the \texttt{step()} for all LanguageAgents, the \texttt{advance()} method updates the state variables for the next timestep.
 
 \subsubsection{Data Collection}
+After the completion of every timestep, the LanguageModel collects various data from the LanguageAgents. In the provided example, this includes the following typical reporters:
+
+\begin{itemize}
+	\item \texttt{pop} - reports the population of each LanguageAgent.
+	      	
+	\item \texttt{lat}, \texttt{long} - reports the location of each LanguageAgent.
+	      	
+	\item \texttt{p\_german}, \texttt{p\_slovene} - reports the probability of speaking a particular language.
+\end{itemize}
+
+The reported data is saved as a \texttt{csv} file.
+
+\section{Input Data and Submodels}
+The model requires locations, population, and names of LanguageAgents to be passed in, usually as \texttt{csv} files.
+
+\subsection{Expected Input}
+The model expects to read in a \texttt{csv} file with the following headings:
+\begin{table}[hp!]
+\centering
+\label{input_data}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{c|c|c|c|c|c|c|c|c}
+id     & location\_name & longitude & latitude & initial\_prob & P\_1880 & \dots    & P\_1909 & P\_1910 \\ \hline
+\vdots & \vdots         & \vdots    & \vdots   & \vdots        & \vdots  & \vdots & \vdots  & \vdots 
+\end{tabular}
+}
+\caption{Input data headings (\texttt{csv})}
+\end{table}
+
+\subsection{Submodels}
+As the population is only available in census increments (every ten years), the population is linearly interpolated for each year inbetween 1880-90, 1890-1900, and 1900-1910. This is done on the input \texttt{csv} file for ease.
 
 
-\section{Input Data}
+\section{Extensions and Future Work}
+Although this model functions, it can still be improved.
 
-\section{Submodels}
+\subsection{Visualization}
+The visualization tools that come with the model are capable of visualizing single timesteps projected on a map of the region.
 
-\section{Extensions/Future Work}
+\begin{figure}[hp!]
+\centering
+\includegraphics[width=0.7\linewidth]{../DiffusionModels/LanguageShift/figures/t14n4}
+\caption[]{Visualization of Simulation (red is German)}
+\label{visualization}
+\end{figure}
+
+The visualization of this model could be further improved to display animations or other better navigated visualizations of timesteps. Other visualization techniques may be useful for other comparisons.
+
+\subsection{Model Validation/Error Analysis}
+A potential issue with this model is that it lacks rigorous validation. 
+
 
 \end{document}
